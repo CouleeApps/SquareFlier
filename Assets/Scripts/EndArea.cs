@@ -38,13 +38,13 @@ public class EndArea : MonoBehaviour {
 	}
 
 	void OnTriggerEnter2D(Collider2D coll) {
-		if (coll.GetComponent<Player>() || coll.GetComponent<OfflinePlayer>()) {
+		if (coll.GetComponent<Player>()) {
 			playersInside ++;
 		}
 	}
 
 	void OnTriggerExit2D(Collider2D coll) {
-		if (coll.GetComponent<Player>() || coll.GetComponent<OfflinePlayer>()) {
+		if (coll.GetComponent<Player>()) {
 			playersInside --;
 		}
 	}

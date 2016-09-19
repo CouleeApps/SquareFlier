@@ -5,7 +5,6 @@ using System.Collections;
 public class Bullet : NetworkBehaviour {
 
 	public float destroyTime = 2.0f;
-	public float continuousTime = 0.5f;
 	public float fadeoutTime = 1.0f;
 	public float updateTime = 1.0f;
 	private float lastUpdate = 0;
@@ -18,15 +17,12 @@ public class Bullet : NetworkBehaviour {
 		lastUpdate = 0;
 		startTime = Time.time;
 		rigid = GetComponent<Rigidbody2D>();
+		rigid.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		var elapsed = Time.time - startTime;
-
-		if (elapsed > continuousTime) {
-			rigid.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
-		}
 
 		if (elapsed > destroyTime - fadeoutTime) {
 			Color newColor = GetComponent<SpriteRenderer>().color;
@@ -41,6 +37,10 @@ public class Bullet : NetworkBehaviour {
 			lastUpdate = Time.time;
 			SetDirtyBit(1);
 		}
+	}
+
+	void OnCollisionEnter2D(Collision2D coll) {
+		GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Discrete;
 	}
 
 	public override bool OnSerialize(NetworkWriter writer, bool initial) {

@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
-public class LevelManager : MonoBehaviour {
+public class LevelManager : NetworkManager {
 
 	public GameObject player;
 	public SceneField[] levelScenes;
 	public int currentLevel;
-
-	public string managerSceneName = "ManagerScene";
 
 	private string currentLevelScene;
 	private enum LoadState {
@@ -48,7 +47,7 @@ public class LevelManager : MonoBehaviour {
 		currentLevelScene = levelScenes[currentLevel].SceneName;
 	
 		//Load the scene they suggested
-		SceneManager.LoadScene(currentLevelScene, LoadSceneMode.Single);
+		ServerChangeScene(currentLevelScene);
 
 		SceneManager.activeSceneChanged += SceneActivated;
 		SceneManager.sceneLoaded += SceneLoaded;
@@ -58,19 +57,5 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void SceneActivated(Scene oldScene, Scene newScene) {
-		if (state == LoadState.LoadingLevel) {
-			//Find any level start areas
-			List<GameObject> startAreas = new List<GameObject>();
-			foreach (GameObject obj in newScene.GetRootGameObjects()) {
-				if (obj.GetComponent<Level>()) {
-					startAreas.Add(obj);
-				}
-			}
-			//And pick a spawnpoint
-			int spawnArea = Random.Range(0, startAreas.Count - 1);
-			startAreas[spawnArea].GetComponent<Level>().StartCoroutine("SpawnPlayer", player);
-
-			state = LoadState.LoadingFinish;
-		}
 	}
 }

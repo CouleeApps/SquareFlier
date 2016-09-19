@@ -23,7 +23,7 @@ public class Player : NetworkBehaviour {
 		lastShoot = Time.time;
 
 		if (GetComponent<NetworkIdentity>().isLocalPlayer) {
-			if (Camera.main.GetComponent<FollowCamera>()) {
+			if (Camera.main && Camera.main.GetComponent<FollowCamera>()) {
 				Camera.main.GetComponent<FollowCamera>().target = gameObject;
 			}
 		}
@@ -92,9 +92,13 @@ public class Player : NetworkBehaviour {
 	[Command]
 	void CmdShoot(Vector2 direction) {
 		var proj = GameObject.Instantiate(projectilePrefab);
+		NetworkServer.SpawnWithClientAuthority(proj, GetComponent<NetworkIdentity>().clientAuthorityOwner);
+		RpcShoot(proj, direction);
+	}
+
+	[ClientRpc]
+	void RpcShoot(GameObject proj, Vector2 direction) {
 		proj.transform.position = transform.position + new Vector3(direction.x, direction.y, 0) * projectileOffset;
 		proj.GetComponent<Rigidbody2D>().velocity = rigid.velocity + direction * projectileVelocity;
-
-		NetworkServer.Spawn(proj);
 	}
 }
