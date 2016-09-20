@@ -101,4 +101,13 @@ public class Player : NetworkBehaviour {
 		proj.transform.position = transform.position + new Vector3(direction.x, direction.y, 0) * projectileOffset;
 		proj.GetComponent<Rigidbody2D>().velocity = rigid.velocity + direction * projectileVelocity;
 	}
+
+	[Command]
+	public void CmdRespawn() {
+		Rigidbody2D rigid = GetComponent<Rigidbody2D>();
+		rigid.position = NetworkManager.singleton.GetStartPosition().position;
+		rigid.rotation = 0;
+		rigid.velocity = Vector2.zero;
+		rigid.angularVelocity = 0;
+	}
 }

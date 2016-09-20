@@ -5,6 +5,7 @@ using System.Collections;
 public class FollowCamera : MonoBehaviour {
 
 	public GameObject target;
+	public float distance = -10.0f;
 
 	// Use this for initialization
 	void Start() {
@@ -14,7 +15,7 @@ public class FollowCamera : MonoBehaviour {
 	// Update is called once per frame
 	void Update() {
 		if (target) {
-			transform.position = new Vector3(target.transform.position.x, target.transform.position.y, -10.0f);
+			transform.position = new Vector3(target.transform.position.x, target.transform.position.y, distance);
 		}
 	}
 }
