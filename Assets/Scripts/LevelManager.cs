@@ -11,7 +11,7 @@ public class LevelManager : MonoBehaviour {
 	public SceneField[] levelScenes;
 	public string[] levelNames;
 	public int currentLevel;
-	public bool isLevelSelect;
+	public bool isLevelSelect = true;
 
 	private string currentLevelScene;
 
