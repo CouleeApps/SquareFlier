@@ -11,6 +11,7 @@ public class LevelManager : MonoBehaviour {
 	public SceneField[] levelScenes;
 	public string[] levelNames;
 	public int currentLevel;
+	public bool isLevelSelect;
 
 	private string currentLevelScene;
 
@@ -18,6 +19,7 @@ public class LevelManager : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 		currentManager = this;
 		SceneManager.LoadScene("LevelSelect");
+		isLevelSelect = true;
 
 		SceneManager.activeSceneChanged += SceneActivated;
 		SceneManager.sceneLoaded += SceneLoaded;
@@ -30,18 +32,21 @@ public class LevelManager : MonoBehaviour {
 
 	public void NextLevel() {
 		int level = currentLevel + 1;
-		//Back to menu
-		if (level == levelScenes.Length) {
-			SceneManager.LoadScene("LevelSelect");
-		}
-		
 		LoadLevel(level);
 	}
 
 	public void LoadLevel(int levelNum) {
 		if (currentLevel == levelNum && (currentLevelScene != null))
 			return;
+		
+		//Back to menu
+		if (levelNum >= levelScenes.Length || levelNum < 0) {
+			SceneManager.LoadScene("LevelSelect");
+			isLevelSelect = true;
+			return;
+		}
 
+		isLevelSelect = false;
 		Debug.Log("Loading level #" + levelNum);
 
 		currentLevel = levelNum;
@@ -55,9 +60,24 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void SceneActivated(Scene oldScene, Scene newScene) {
+		if (IsLevelSelect()) {
+			return;
+		}
+
 		//Spawn player
 		var newPlayer = GameObject.Instantiate(playerPrefab);
 		newPlayer.GetComponent<Player>().Respawn();
+
+		GameObject[] endPoints = GetEndPoints();
+		foreach (GameObject obj in endPoints) {
+			obj.GetComponent<EndArea>().winEvent.AddListener(() => {
+				this.NextLevel();
+			});
+		}
+	}
+
+	public static bool IsLevelSelect() {
+		return currentManager.isLevelSelect;
 	}
 
 	public static GameObject GetSpawnPoint() {
@@ -68,5 +88,16 @@ public class LevelManager : MonoBehaviour {
 			}
 		}
 		return null;
+	}
+
+	public static GameObject[] GetEndPoints() {
+		List<GameObject> endPoints = new List<GameObject>();
+		GameObject[] roots = SceneManager.GetActiveScene().GetRootGameObjects();
+		foreach (GameObject obj in roots) {
+			if (obj.GetComponent<EndArea>()) {
+				endPoints.Add(obj);
+			}
+		}
+		return endPoints.ToArray();
 	}
 }
