@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
 using System.Collections;
 
-public class Death : NetworkBehaviour {
+public class Death : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -19,7 +18,7 @@ public class Death : NetworkBehaviour {
 			GameObject.Destroy(coll.gameObject);
 		}
 		if (coll.gameObject.GetComponent<Player>()) {
-			coll.gameObject.GetComponent<Player>().CmdRespawn();
+			coll.gameObject.GetComponent<Player>().Respawn();
 		}
 	}
 }

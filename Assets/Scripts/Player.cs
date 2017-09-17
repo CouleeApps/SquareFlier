@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
 using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Player : NetworkBehaviour {
+public class Player : MonoBehaviour {
 
 	public float horizForce = 30.0f;
 	public float upForce = 30.0f;
@@ -22,10 +21,8 @@ public class Player : NetworkBehaviour {
 		rigid = GetComponent<Rigidbody2D>();
 		lastShoot = Time.time;
 
-		if (GetComponent<NetworkIdentity>().isLocalPlayer) {
-			if (Camera.main && Camera.main.GetComponent<FollowCamera>()) {
-				Camera.main.GetComponent<FollowCamera>().target = gameObject;
-			}
+		if (Camera.main && Camera.main.GetComponent<FollowCamera>()) {
+			Camera.main.GetComponent<FollowCamera>().target = gameObject;
 		}
 	}
 	
@@ -35,8 +32,6 @@ public class Player : NetworkBehaviour {
 	}
 
 	void FixedUpdate() {
-		if (!GetComponent<NetworkIdentity>().isLocalPlayer)
-			return;
 		//So we know which direction to fire
 		var up    = Input.GetKey("up")    || Input.GetKey("w");
 		var down  = Input.GetKey("down")  || Input.GetKey("s");
@@ -75,37 +70,30 @@ public class Player : NetworkBehaviour {
 			lastShoot = Time.time;
 
 			if (up) {
-				CmdShoot(new Vector2(0, -1));
+				Shoot(new Vector2(0, -1));
 			}
 			if (down) {
-				CmdShoot(new Vector2(0, 1));
+				Shoot(new Vector2(0, 1));
 			}
 			if (left) {
-				CmdShoot(new Vector2(1, 0));
+				Shoot(new Vector2(1, 0));
 			}
 			if (right) {
-				CmdShoot(new Vector2(-1, 0));
+				Shoot(new Vector2(-1, 0));
 			}
 		}
 	}
 
-	[Command]
-	void CmdShoot(Vector2 direction) {
+	void Shoot(Vector2 direction) {
 		var proj = GameObject.Instantiate(projectilePrefab);
-		NetworkServer.SpawnWithClientAuthority(proj, GetComponent<NetworkIdentity>().clientAuthorityOwner);
-		RpcShoot(proj, direction);
-	}
-
-	[ClientRpc]
-	void RpcShoot(GameObject proj, Vector2 direction) {
 		proj.transform.position = transform.position + new Vector3(direction.x, direction.y, 0) * projectileOffset;
 		proj.GetComponent<Rigidbody2D>().velocity = rigid.velocity + direction * projectileVelocity;
 	}
 
-	[Command]
-	public void CmdRespawn() {
+	public void Respawn() {
+		GameObject spawnPoint = LevelManager.GetSpawnPoint();
 		Rigidbody2D rigid = GetComponent<Rigidbody2D>();
-		rigid.position = NetworkManager.singleton.GetStartPosition().position;
+		rigid.position = spawnPoint.transform.position;
 		rigid.rotation = 0;
 		rigid.velocity = Vector2.zero;
 		rigid.angularVelocity = 0;

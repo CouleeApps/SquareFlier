@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+namespace SquareFlier {
+
 /// <summary>
 /// Basic path class. Add children which have a PathNode component for the nodes along the path.
 /// </summary>
@@ -138,4 +140,6 @@ public class Path : MonoBehaviour {
 		}
 		return time;
 	}
+}
+
 }

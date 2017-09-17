@@ -1,25 +1,26 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
-public class LevelManager : NetworkManager {
+public class LevelManager : MonoBehaviour {
 
-	public GameObject player;
+	public static LevelManager currentManager;
+
+	public GameObject playerPrefab;
 	public SceneField[] levelScenes;
+	public string[] levelNames;
 	public int currentLevel;
 
 	private string currentLevelScene;
-	private enum LoadState {
-		LoadingManager,
-		LoadingLevel,
-		LoadingFinish
-	};
-	private LoadState state;
 
 	void Start() {
 		DontDestroyOnLoad(gameObject);
+		currentManager = this;
+		SceneManager.LoadScene("LevelSelect");
+
+		SceneManager.activeSceneChanged += SceneActivated;
+		SceneManager.sceneLoaded += SceneLoaded;
 	}
 
 	// Update is called once per frame
@@ -29,9 +30,10 @@ public class LevelManager : NetworkManager {
 
 	public void NextLevel() {
 		int level = currentLevel + 1;
-		//Just wrap for now
-		if (level == levelScenes.Length)
-			level = 0;
+		//Back to menu
+		if (level == levelScenes.Length) {
+			SceneManager.LoadScene("LevelSelect");
+		}
 		
 		LoadLevel(level);
 	}
@@ -42,20 +44,29 @@ public class LevelManager : NetworkManager {
 
 		Debug.Log("Loading level #" + levelNum);
 
-		state = LoadState.LoadingLevel;
 		currentLevel = levelNum;
 		currentLevelScene = levelScenes[currentLevel].SceneName;
 	
 		//Load the scene they suggested
-		ServerChangeScene(currentLevelScene);
-
-		SceneManager.activeSceneChanged += SceneActivated;
-		SceneManager.sceneLoaded += SceneLoaded;
+		SceneManager.LoadScene(currentLevelScene);
 	}
 
 	void SceneLoaded(Scene scene, LoadSceneMode mode) {
 	}
 
 	void SceneActivated(Scene oldScene, Scene newScene) {
+		//Spawn player
+		var newPlayer = GameObject.Instantiate(playerPrefab);
+		newPlayer.GetComponent<Player>().Respawn();
+	}
+
+	public static GameObject GetSpawnPoint() {
+		GameObject[] roots = SceneManager.GetActiveScene().GetRootGameObjects();
+		foreach (GameObject obj in roots) {
+			if (obj.GetComponent<SpawnPoint>()) {
+				return obj;
+			}
+		}
+		return null;
 	}
 }

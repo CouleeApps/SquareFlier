@@ -3,7 +3,7 @@
 [RequireComponent(typeof(Rigidbody2D))]
 public class MovingBody : MonoBehaviour {
 
-	public Path path;
+	public SquareFlier.Path path;
 
 	private float startTime;
 
