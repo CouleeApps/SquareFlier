@@ -1,32 +1,62 @@
-﻿//http://answers.unity3d.com/questions/441246/editor-script-to-make-play-always-jump-to-a-start.html
-
-// IN YOUR EDITOR FOLDER, have SimpleEditorUtils.cs.
-// paste in this text.
-// to play, HIT COMMAND-ZERO rather than command-P
-// (the zero key, is near the P key, so it's easy to remember)
-// simply insert the actual name of your opening scene
-// "__preEverythingScene" on the second last line of code below.
-
+﻿//http://answers.unity3d.com/answers/1248399/view.html
 using UnityEditor;
 using UnityEngine;
+using System.IO;
+using System.Linq;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
-[InitializeOnLoad]
-public static class StartSceneLoad
-{
-	// click command-0 to go to the prelaunch scene and then play
+public static class PlayFromTheFirstScene
+{      
+	const string playFromFirstMenuStr = "Edit/Always Start From Scene 0 &p";
 
-	[MenuItem("Edit/Play-Unplay, But From Prelaunch Scene %0")]
-	public static void PlayFromPrelaunchScene()
+	static bool playFromFirstScene
 	{
-		if ( EditorApplication.isPlaying == true )
+		get{return EditorPrefs.HasKey(playFromFirstMenuStr) && EditorPrefs.GetBool(playFromFirstMenuStr);}
+		set{EditorPrefs.SetBool(playFromFirstMenuStr, value);}
+	}
+
+	[MenuItem(playFromFirstMenuStr, false, 150)]
+	static void PlayFromFirstSceneCheckMenu() 
+	{
+		playFromFirstScene = !playFromFirstScene;
+		Menu.SetChecked(playFromFirstMenuStr, playFromFirstScene);
+
+		ShowNotifyOrLog(playFromFirstScene ? "Play from scene 0" : "Play from current scene");
+	}
+
+	// The menu won't be gray out, we use this validate method for update check state
+	[MenuItem(playFromFirstMenuStr, true)]
+	static bool PlayFromFirstSceneCheckMenuValidate()
+	{
+		Menu.SetChecked(playFromFirstMenuStr, playFromFirstScene);
+		return true;
+	}
+
+	// This method is called before any Awake. It's the perfect callback for this feature
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] 
+	static void LoadFirstSceneAtGameBegins()
+	{
+		if(!playFromFirstScene)
+			return;
+
+		if(EditorBuildSettings.scenes.Length == 0)
 		{
-			EditorApplication.isPlaying = false;
+			Debug.LogWarning("The scene build list is empty. Can't play from first scene.");
 			return;
 		}
-		EditorApplication.SaveCurrentSceneIfUserWantsTo();
-		EditorApplication.OpenScene(
-			"Assets/Scenes/StartScene.unity");
-		EditorApplication.isPlaying = true;
+
+		foreach(GameObject go in Object.FindObjectsOfType<GameObject>())
+			go.SetActive(false);
+
+		SceneManager.LoadScene(0);
+	}
+
+	static void ShowNotifyOrLog(string msg)
+	{
+		if(Resources.FindObjectsOfTypeAll<SceneView>().Length > 0)
+			EditorWindow.GetWindow<SceneView>().ShowNotification(new GUIContent(msg));
+		else
+			Debug.Log(msg); // When there's no scene view opened, we just print a log
 	}
 }
