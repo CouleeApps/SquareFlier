@@ -48,4 +48,10 @@ public class AddLevelsToBuild {
 	static void OnDidReloadScripts() {
 		AddLevels();
 	}
+
+	//If that _still_ doesn't work, this will make it update next time you play
+	static AddLevelsToBuild() {
+		EditorApplication.playmodeStateChanged += AddLevels;
+	}
+
 }
