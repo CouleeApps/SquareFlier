@@ -62,7 +62,6 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void SceneLoaded(Scene scene, LoadSceneMode mode) {
-		TimeManager.CurrentManager.ShowTimer(!isLevelSelect);
 	}
 
 	void SceneActivated(Scene oldScene, Scene newScene) {

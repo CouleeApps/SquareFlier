@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class LevelSelect : MonoBehaviour {
 
 	public GameObject buttonPrefab;
+    public GameObject uiTimerToggle;
 	RectTransform t;
 
 	// Use this for initialization
@@ -27,6 +28,11 @@ public class LevelSelect : MonoBehaviour {
 			levelButton.GetComponentInChildren<Text>().text = name;
 			buttonTrans.anchoredPosition = new Vector3(0, -20 - (i * (buttonTrans.rect.height + 10)), 0);
 		}
+
+        uiTimerToggle.GetComponent<Toggle>().onValueChanged.AddListener((bool newState) =>
+        {
+            PreferenceManager.CurrentManager.ShowTimer = newState;
+        });
 	}
 	
 	// Update is called once per frame
