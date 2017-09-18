@@ -5,19 +5,20 @@ using System.Collections.Generic;
 
 public class LevelManager : MonoBehaviour {
 
-	public static LevelManager currentManager;
+	public static LevelManager CurrentManager;
 
 	public GameObject playerPrefab;
 	public SceneField[] levelScenes;
 	public string[] levelNames;
 	public int currentLevel;
 	public bool isLevelSelect = true;
+	public GameObject currentPlayer;
 
 	private string currentLevelScene;
 
 	void Start() {
 		DontDestroyOnLoad(gameObject);
-		currentManager = this;
+		CurrentManager = this;
 		LoadLevelSelect();
 
 		SceneManager.activeSceneChanged += SceneActivated;
@@ -49,7 +50,7 @@ public class LevelManager : MonoBehaviour {
 			LoadLevelSelect();
 			return;
 		}
-
+			
 		isLevelSelect = false;
 		Debug.Log("Loading level #" + levelNum);
 
@@ -61,27 +62,40 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void SceneLoaded(Scene scene, LoadSceneMode mode) {
+		TimeManager.CurrentManager.ShowTimer(!isLevelSelect);
 	}
 
 	void SceneActivated(Scene oldScene, Scene newScene) {
 		if (IsLevelSelect()) {
 			return;
 		}
+		LevelStarted();
+	}
 
+	private void LevelStarted() {
 		//Spawn player
-		var newPlayer = GameObject.Instantiate(playerPrefab);
-		newPlayer.GetComponent<Player>().Respawn();
+		currentPlayer = GameObject.Instantiate(playerPrefab);
+		currentPlayer.GetComponent<Player>().Respawn();
 
 		GameObject[] endPoints = GetEndPoints();
 		foreach (GameObject obj in endPoints) {
 			obj.GetComponent<EndArea>().winEvent.AddListener(() => {
-				this.NextLevel();
+				this.LevelEnded();
 			});
 		}
+
+		TimeManager.CurrentManager.StartTimer();
+	}
+
+	private void LevelEnded() {
+		TimeManager.CurrentManager.StopTimer();
+		Destroy(currentPlayer);
+
+		Invoke("NextLevel", 3.0f);
 	}
 
 	public static bool IsLevelSelect() {
-		return currentManager.isLevelSelect;
+		return CurrentManager.isLevelSelect;
 	}
 
 	public static GameObject GetSpawnPoint() {

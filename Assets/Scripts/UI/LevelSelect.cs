@@ -10,7 +10,7 @@ public class LevelSelect : MonoBehaviour {
 
 	// Use this for initialization
 	void Start() {
-		LevelManager manager = LevelManager.currentManager;
+		LevelManager manager = LevelManager.CurrentManager;
 		t = GetComponent<RectTransform>();
 
 		for (int i = 0; i < manager.levelNames.Length; i++) {
