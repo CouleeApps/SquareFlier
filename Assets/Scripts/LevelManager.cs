@@ -18,8 +18,7 @@ public class LevelManager : MonoBehaviour {
 	void Start() {
 		DontDestroyOnLoad(gameObject);
 		currentManager = this;
-		SceneManager.LoadScene("LevelSelect");
-		isLevelSelect = true;
+		LoadLevelSelect();
 
 		SceneManager.activeSceneChanged += SceneActivated;
 		SceneManager.sceneLoaded += SceneLoaded;
@@ -28,6 +27,12 @@ public class LevelManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update() {
 	
+	}
+
+	public void LoadLevelSelect() {
+		SceneManager.LoadScene("LevelSelect");
+		isLevelSelect = true;
+		currentLevel = -1;
 	}
 
 	public void NextLevel() {
@@ -41,8 +46,7 @@ public class LevelManager : MonoBehaviour {
 		
 		//Back to menu
 		if (levelNum >= levelScenes.Length || levelNum < 0) {
-			SceneManager.LoadScene("LevelSelect");
-			isLevelSelect = true;
+			LoadLevelSelect();
 			return;
 		}
 
