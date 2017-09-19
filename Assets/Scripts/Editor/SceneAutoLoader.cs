@@ -58,7 +58,7 @@ static class SceneAutoLoader {
 
 		if (!EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode) {
 			// User pressed play -- autoload master scene.
-			PreviousScene = EditorSceneManager.GetActiveScene().path;
+			PreviousScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
 			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) {
 				EditorSceneManager.OpenScene(MasterScene);
 
@@ -90,7 +90,7 @@ static class SceneAutoLoader {
 	}
 
 	private static string PreviousScene {
-		get { return EditorPrefs.GetString(cEditorPrefPreviousScene, EditorSceneManager.GetActiveScene().path); }
+		get { return EditorPrefs.GetString(cEditorPrefPreviousScene, UnityEngine.SceneManagement.SceneManager.GetActiveScene().path); }
 		set { EditorPrefs.SetString(cEditorPrefPreviousScene, value); }
 	}
 }
