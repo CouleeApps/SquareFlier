@@ -32,6 +32,12 @@ public class Player : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
+        //Don't move unless the game is running
+        if (!Physics2D.autoSimulation)
+        {
+            return;
+        }
+
 		//So we know which direction to fire
 		var up    = Input.GetKey("up")    || Input.GetKey("w");
 		var down  = Input.GetKey("down")  || Input.GetKey("s");
@@ -97,5 +103,7 @@ public class Player : MonoBehaviour {
 		rigid.rotation = 0;
 		rigid.velocity = Vector2.zero;
 		rigid.angularVelocity = 0;
+
+        transform.position = spawnPoint.transform.position;
 	}
 }

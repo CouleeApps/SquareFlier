@@ -54,4 +54,10 @@ public class TimeManager : MonoBehaviour {
 
 		OnStopTimer.Invoke();
 	}
+
+    public void ResetTimer()
+    {
+        CurrentTime = 0.0f;
+        StopTimer();
+    }
 }

@@ -70,17 +70,18 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void SceneLoaded(Scene scene, LoadSceneMode mode) {
+        Physics2D.autoSimulation = false;
 	}
 
 	void SceneActivated(Scene oldScene, Scene newScene) {
 		if (IsLevelSelect()) {
 			return;
 		}
-		LevelStarted();
+		LevelLoaded();
 	}
 
-    private void LevelStarted() {
-        Invoke("SpawnPlayer", 1.0f);
+    private void LevelLoaded() {
+        Invoke("StartLevel", 1.0f);
 
         GameObject[] endPoints = GetEndPoints();
         foreach (GameObject obj in endPoints) {
@@ -88,14 +89,17 @@ public class LevelManager : MonoBehaviour {
                 this.LevelEnded();
             });
         }
-    }
 
-    private void SpawnPlayer()
-    {
+        TimeManager.CurrentManager.ResetTimer();
+
         //Spawn player
         currentPlayer = GameObject.Instantiate(playerPrefab);
         currentPlayer.GetComponent<Player>().Respawn();
+    }
 
+    private void StartLevel()
+    {
+        Physics2D.autoSimulation = true;
         TimeManager.CurrentManager.StartTimer();
 	}
 
@@ -103,7 +107,7 @@ public class LevelManager : MonoBehaviour {
 		TimeManager.CurrentManager.StopTimer();
 		Destroy(currentPlayer);
 
-		Invoke("NextLevel", 3.0f);
+		Invoke("NextLevel", 1.0f);
 	}
 
 	public static bool IsLevelSelect() {
