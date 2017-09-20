@@ -11,8 +11,9 @@ public class LevelManager : MonoBehaviour {
 	public SceneField[] levelScenes;
 	public string[] levelNames;
 	public int currentLevel;
-	public bool isLevelSelect = true;
 	public GameObject currentPlayer;
+	public bool isLevelSelect = true;
+    public bool isGameRunning = false;
 
 	private string currentLevelScene;
 
@@ -34,9 +35,9 @@ public class LevelManager : MonoBehaviour {
 		SceneManager.LoadScene("LevelSelect");
 		isLevelSelect = true;
 		currentLevel = -1;
-	}
+    }
 
-	public void NextLevel() {
+    public void NextLevel() {
 		int level = currentLevel + 1;
 		LoadLevel(level);
 	}
@@ -58,11 +59,13 @@ public class LevelManager : MonoBehaviour {
 			LoadLevelSelect();
 			return;
 		}
-			
+		
 		isLevelSelect = false;
 		Debug.Log("Loading level #" + levelNum);
 
-		currentLevel = levelNum;
+        TimeManager.CurrentManager.ResetTimer();
+
+        currentLevel = levelNum;
 		currentLevelScene = levelScenes[currentLevel].SceneName;
 	
 		//Load the scene they suggested
@@ -70,6 +73,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void SceneLoaded(Scene scene, LoadSceneMode mode) {
+        isGameRunning = false;
         Physics2D.autoSimulation = false;
 	}
 
@@ -82,6 +86,7 @@ public class LevelManager : MonoBehaviour {
 
     private void LevelLoaded() {
         Invoke("StartLevel", 1.0f);
+        isGameRunning = false;
 
         GameObject[] endPoints = GetEndPoints();
         foreach (GameObject obj in endPoints) {
@@ -89,8 +94,6 @@ public class LevelManager : MonoBehaviour {
                 this.LevelEnded();
             });
         }
-
-        TimeManager.CurrentManager.ResetTimer();
 
         //Spawn player
         currentPlayer = GameObject.Instantiate(playerPrefab);
@@ -100,12 +103,14 @@ public class LevelManager : MonoBehaviour {
     private void StartLevel()
     {
         Physics2D.autoSimulation = true;
+        isGameRunning = true;
         TimeManager.CurrentManager.StartTimer();
 	}
 
 	private void LevelEnded() {
 		TimeManager.CurrentManager.StopTimer();
-		Destroy(currentPlayer);
+        isGameRunning = false;
+        Destroy(currentPlayer);
 
 		Invoke("NextLevel", 1.0f);
 	}

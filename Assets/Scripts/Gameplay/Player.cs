@@ -33,7 +33,7 @@ public class Player : MonoBehaviour {
 
 	void FixedUpdate() {
         //Don't move unless the game is running
-        if (!Physics2D.autoSimulation)
+        if (!LevelManager.CurrentManager.isGameRunning)
         {
             return;
         }

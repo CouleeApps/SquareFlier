@@ -47,6 +47,7 @@ public class TimeManager : MonoBehaviour {
 		TimerRunning = true;
 
 		OnStartTimer.Invoke();
+        OnTimeUpdate.Invoke();
 	}
 
 	public void StopTimer() {
@@ -59,5 +60,7 @@ public class TimeManager : MonoBehaviour {
     {
         CurrentTime = 0.0f;
         StopTimer();
+
+        OnTimeUpdate.Invoke();
     }
 }

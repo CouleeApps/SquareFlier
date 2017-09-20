@@ -36,7 +36,7 @@ public class HUD : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && LevelManager.CurrentManager.isGameRunning)
         {
             ShowPauseMenu = !ShowPauseMenu;
         }
@@ -83,11 +83,6 @@ public class HUD : MonoBehaviour
 
     private void UpdateTimer()
     {
-        //Don't update UI if we're not showing
-        if (!ShowTimer)
-        {
-            return;
-        }
         timerText.GetComponent<Text>().text = TimeManager.FormatTime(TimeManager.CurrentManager.CurrentTime);
     }
 
