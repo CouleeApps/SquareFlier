@@ -41,7 +41,15 @@ public class LevelManager : MonoBehaviour {
 		LoadLevel(level);
 	}
 
-	public void LoadLevel(int levelNum) {
+    public void RestartLevel()
+    {
+        Debug.Log("Restarting level #" + currentLevel);
+
+        //Load the scene they suggested
+        SceneManager.LoadScene(currentLevelScene);
+    }
+
+    public void LoadLevel(int levelNum) {
 		if (currentLevel == levelNum && (currentLevelScene != null))
 			return;
 		
@@ -71,19 +79,24 @@ public class LevelManager : MonoBehaviour {
 		LevelStarted();
 	}
 
-	private void LevelStarted() {
-		//Spawn player
-		currentPlayer = GameObject.Instantiate(playerPrefab);
-		currentPlayer.GetComponent<Player>().Respawn();
+    private void LevelStarted() {
+        Invoke("SpawnPlayer", 1.0f);
 
-		GameObject[] endPoints = GetEndPoints();
-		foreach (GameObject obj in endPoints) {
-			obj.GetComponent<EndArea>().winEvent.AddListener(() => {
-				this.LevelEnded();
-			});
-		}
+        GameObject[] endPoints = GetEndPoints();
+        foreach (GameObject obj in endPoints) {
+            obj.GetComponent<EndArea>().winEvent.AddListener(() => {
+                this.LevelEnded();
+            });
+        }
+    }
 
-		TimeManager.CurrentManager.StartTimer();
+    private void SpawnPlayer()
+    {
+        //Spawn player
+        currentPlayer = GameObject.Instantiate(playerPrefab);
+        currentPlayer.GetComponent<Player>().Respawn();
+
+        TimeManager.CurrentManager.StartTimer();
 	}
 
 	private void LevelEnded() {

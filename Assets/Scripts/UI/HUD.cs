@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class HUD : MonoBehaviour {
+public class HUD : MonoBehaviour
+{
     public GameObject canvas;
 
     /// <summary>
@@ -13,8 +14,14 @@ public class HUD : MonoBehaviour {
     public GameObject timerPanel;
     public GameObject timerText;
 
+    /// <summary>
+    /// Pause Menu
+    /// </summary>
+    public GameObject pausePanel;
+
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
         //Persist this, make it global
         DontDestroyOnLoad(gameObject);
         SceneManager.sceneLoaded += SceneLoaded;
@@ -22,12 +29,17 @@ public class HUD : MonoBehaviour {
         TimeManager.CurrentManager.OnStartTimer.AddListener(UpdateTimer);
         TimeManager.CurrentManager.OnStopTimer.AddListener(UpdateTimer);
         TimeManager.CurrentManager.OnTimeUpdate.AddListener(UpdateTimer);
+
+        ShowPauseMenu = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ShowPauseMenu = !ShowPauseMenu;
+        }
     }
 
     private void SceneLoaded(Scene scene, LoadSceneMode mode)
@@ -35,7 +47,35 @@ public class HUD : MonoBehaviour {
         ShowTimer = ShouldShowTimer();
     }
 
-#region Timer
+    #region Pause Menu
+
+    public bool ShowPauseMenu
+    {
+        get
+        {
+            return pausePanel.activeSelf;
+        }
+        set
+        {
+            pausePanel.SetActive(value);
+        }
+    }
+
+    public void EndLevel()
+    {
+        ShowPauseMenu = false;
+        LevelManager.CurrentManager.LoadLevelSelect();
+    }
+
+    public void RestartLevel()
+    {
+        ShowPauseMenu = false;
+        LevelManager.CurrentManager.RestartLevel();
+    }
+
+    #endregion
+
+    #region Timer
     public bool ShouldShowTimer()
     {
         return !LevelManager.IsLevelSelect() && PreferenceManager.CurrentManager.ShowTimer;
@@ -62,6 +102,6 @@ public class HUD : MonoBehaviour {
             timerPanel.SetActive(value);
         }
     }
-#endregion
+    #endregion
 
 }
